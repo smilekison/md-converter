@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Markdown Studio
 
-## Getting Started
+A simple, fully client-side web app: upload a `.md`/`.markdown`/`.txt` file and download it as a properly formatted **PDF** or **DOCX** — headings, bold/italic, links, ordered and unordered (including nested and task) lists, code blocks, blockquotes, tables, and horizontal rules are all rendered as real document structure, not a screenshot.
 
-First, run the development server:
+Nothing is uploaded anywhere. Parsing and conversion happen entirely in the browser tab.
+
+## Run locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000, drop in a Markdown file, and download.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How it works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. `lib/parseMarkdown.ts` parses the uploaded text into an [mdast](https://github.com/syntax-tree/mdast) syntax tree (via `unified`/`remark-parse`/`remark-gfm`) — the single shared source both converters below, and the live on-page preview, are built from.
+2. `lib/convertToDocx.ts` walks that tree and builds a real `.docx` file with the [`docx`](https://www.npmjs.com/package/docx) library.
+3. `lib/convertToPdf.ts` walks the same tree and lays out real, selectable PDF text with [`jsPDF`](https://www.npmjs.com/package/jspdf) (tables via `jspdf-autotable`) — including manual word-wrapping across mixed bold/italic/code/link runs and automatic pagination.
+4. `lib/inlineRuns.ts` is the shared inline-formatting extractor both converters call, so bold/italic/strikethrough/code/link handling can't drift between the two output formats.
 
-## Learn More
+## Known limitations (v1)
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Images referenced in the Markdown are rendered as a `[image: ...]` text placeholder rather than embedded — embedding would require fetching external image bytes client-side, which isn't reliable for arbitrary URLs.
+- Ordered-list numbering in the DOCX output restarts at 1 per list rather than tracking state across separate lists in the same document.
+- PDF paragraphs wrap flush-left rather than with a hanging indent under list markers.

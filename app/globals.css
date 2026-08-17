@@ -1,26 +1,59 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f9;
+  --surface: #ffffff;
+  --foreground: #1c1c22;
+  --muted: #6b7280;
+  --border: #e5e5ea;
+  --accent: #4f46e5;
+  --accent-ink: #ffffff;
+  --code-bg: #f1f1f4;
 }
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #101014;
+    --surface: #17171d;
+    --foreground: #eceef1;
+    --muted: #9498a3;
+    --border: #2a2a32;
+    --accent: #818cf8;
+    --accent-ink: #16161c;
+    --code-bg: #1e1e26;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+.prose :where(code):not(:where([class~="not-prose"] *))::before,
+.prose :where(code):not(:where([class~="not-prose"] *))::after {
+  content: none;
+}
+.prose :where(code):not(:where([class~="not-prose"] *)) {
+  background: var(--code-bg);
+  padding: 0.15em 0.4em;
+  border-radius: 0.35em;
+  font-weight: 500;
+}
+.prose :where(pre):not(:where([class~="not-prose"] *)) {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
 }
