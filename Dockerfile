@@ -4,5 +4,4 @@ COPY package*.json ./
 RUN npm install --omit=dev || npm install
 COPY . .
 EXPOSE 3000
-CMD ["npm","build"]
-CMD ["next", "start"]
+CMD ["npm","run","dev"]
